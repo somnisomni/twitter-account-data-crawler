@@ -51,7 +51,7 @@ Currently only MySQL(and probably MySQL-based DBMS like [MariaDB](https://mariad
 
 Creating tables per target account is recommended.
 
-The table AT LEAST should have these columns:
+The table *at least* should have these columns:
   - `date`: type **date**
   - `following_count`: type **int**, unsigned
   - `follower_count`: type **int**, unsigned
@@ -61,8 +61,8 @@ An example SQL query for these columns:
 ```sql
 CREATE TABLE `account_track_table` (
   `date` date NOT NULL,
-  `following_count` int UNSIGNED DEFAULT NULL,
+  `following_count` int UNSIGNED NOT NULL,
   `follower_count` int UNSIGNED NOT NULL,
-  `tweet_count` int UNSIGNED DEFAULT NULL
+  `tweet_count` int UNSIGNED NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 ```
