@@ -1,0 +1,4 @@
+pyyaml
+pymysql
+APScheduler
+selenium

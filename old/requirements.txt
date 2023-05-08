@@ -1,0 +1,4 @@
+python-twitter
+pyyaml
+pymysql
+APScheduler
