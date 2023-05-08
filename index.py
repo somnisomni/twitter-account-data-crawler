@@ -148,23 +148,30 @@ def daily_loop():
     else:
         log("Can't continue due to error!")
 
-  with connect_db() as db_connection:
-    with db_connection.cursor() as cursor:
-      for target in config["targets"]:
-        followers = fetched_data[target["id"]]["follower_count"]
-        followings = fetched_data[target["id"]]["following_count"]
-        statuses = fetched_data[target["id"]]["tweet_count"]
+  try:
+    with connect_db() as db_connection:
+      log("Connected with database server.")
 
-        try:
-          cursor.execute("INSERT INTO {} (date, following_count, follower_count, tweet_count) VALUES (%s, %s, %s, %s)".format(str(target["table"]).split()[0]),
-                        (date.today().strftime("%Y-%m-%d"),
-                         followings,
-                         followers,
-                         statuses))
-        finally:
-          pass
-      cursor.fetchall()
-    db_connection.commit()
+      with db_connection.cursor() as cursor:
+        for target in config["targets"]:
+          followers = fetched_data[target["id"]]["follower_count"]
+          followings = fetched_data[target["id"]]["following_count"]
+          statuses = fetched_data[target["id"]]["tweet_count"]
+
+          try:
+            cursor.execute("INSERT INTO {} (date, following_count, follower_count, tweet_count) VALUES (%s, %s, %s, %s)".format(str(target["table"]).split()[0]),
+                          (date.today().strftime("%Y-%m-%d"),
+                          followings,
+                          followers,
+                          statuses))
+            log("Row inserted.")
+          finally:
+            pass
+        cursor.fetchall()
+      db_connection.commit()
+      log("Database changes are successfully committed.")
+  except:
+    log("Something wrong while manipulating the database! Is database server available, and database config is valid?")
 
   log("Chrome WebDriver cleanup.")
   driver.quit()
@@ -185,7 +192,7 @@ if __name__ == "__main__":
   sched.add_job(daily_loop, CronTrigger.from_crontab("59 23 * * *"))
 
   try:
-    log("\nDaily loop job scheduled, timezone = {}".format(sched.timezone.zone))
+    log("\nDaily loop job scheduled, at 23:59 everyday. timezone = {}".format(sched.timezone.zone))
     sched.start()
   except (KeyboardInterrupt, SystemExit):
     log("Exiting...")
