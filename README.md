@@ -13,7 +13,7 @@ Why? You Can Simply Use Twitter API, Aren't You?
 
 **YES, I HAD.** but one day Twitter suspended my API application, even though I didn't overuse or abuse it! ~~Probably this is an Elon thing~~
 
-Source code of original implementation, which uses Twitter API using [`python-twitter`](https://github.com/bear/python-twitter), is stored in [`old`](old/) directory.
+Source code of original implementation, which uses Twitter API using [`python-twitter`](https://github.com/bear/python-twitter), is stored in [`old` branch](https://github.com/somnisomni/twitter-account-data-crawler/tree/old-using-twitter-api).
 
 
 Deal With Docker
