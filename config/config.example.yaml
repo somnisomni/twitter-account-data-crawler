@@ -1,0 +1,16 @@
+twitter:
+  consumerKey: consumer_key
+  consumerSecret: consumer_secret
+
+mysql:
+  host: 127.0.0.1
+  port: 3309
+  username: crawler_user
+  password: crawler_password
+  database: account_track
+
+targets:
+  - id: 12
+    table: twitter_jack
+  - id: 11348282
+    table: twitter_nasa
