@@ -40,7 +40,16 @@ If you're using [Podman](https://podman.io/), just replace `docker` with `podman
 
 Deal Without Docker
 -------------------
-You may still run the program without Docker or OCI-compliant runtimes. Just directly run `index.py` using Python 3 like: `$ python index.py`.
+You may still run the program without Docker or OCI-compliant runtimes.
+
+To get this work:
+```sh
+$ cd <root-direvtory-of-source>
+# Install requirements
+$ pip install -r requirements.txt
+# and run!
+$ python index.py
+```
 
 Configuration file(`config.yaml`) should be exist in `config` folder.
 
