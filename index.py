@@ -131,6 +131,8 @@ def daily_loop():
 
   log("\nDaily loop job started...")
 
+  today_date = date.today()
+
   driver = create_chrome_webdriver()
   if not driver:
     log("Error while creating Chrome WebDriver.")
@@ -160,7 +162,7 @@ def daily_loop():
 
           try:
             cursor.execute("INSERT INTO {} (date, following_count, follower_count, tweet_count) VALUES (%s, %s, %s, %s)".format(str(target["table"]).split()[0]),
-                          (date.today().strftime("%Y-%m-%d"),
+                          (today_date.strftime("%Y-%m-%d"),
                           followings,
                           followers,
                           statuses))
