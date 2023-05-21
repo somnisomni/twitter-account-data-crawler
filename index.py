@@ -189,12 +189,17 @@ if __name__ == "__main__":
   if not load_config():
     exit(1)
 
+  # Log configuration
+  log("Total {} account(s) will be crawled.".format(len(config["targets"])))
+
   # Schedule
+  SCHED_HOUR = 23
+  SCHED_MINUTE = 58
   sched = BlockingScheduler(timezone="Asia/Seoul")
-  sched.add_job(daily_loop, CronTrigger.from_crontab("59 23 * * *"))
+  sched.add_job(daily_loop, CronTrigger.from_crontab("{} {} * * *".format(SCHED_MINUTE, SCHED_HOUR)))
 
   try:
-    log("\nDaily loop job scheduled, at 23:59 everyday. timezone = {}".format(sched.timezone.zone))
+    log("\nDaily loop job scheduled, at {}:{} everyday. timezone = {}".format(SCHED_HOUR, SCHED_MINUTE, sched.timezone.zone))
     sched.start()
   except (KeyboardInterrupt, SystemExit):
     log("Exiting...")
