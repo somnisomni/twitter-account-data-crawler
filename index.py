@@ -71,7 +71,7 @@ def wait_for_dynamic_load(driver: webdriver.Chrome):
 
 def try_find_user_profile_schema(driver: webdriver.Chrome) -> dict:
   find_count = 1
-  find_count_max = 10
+  find_count_max = 5
   find_interval_sec = 1
   found_element: WebElement = None
   schema_str = None
@@ -98,7 +98,7 @@ def try_find_user_profile_schema(driver: webdriver.Chrome) -> dict:
       sleep(find_interval_sec)
 
   if not found_element:
-    log("Can't find user profile schema; was the website updated?")
+    log("Can't find user profile schema; was the website updated, or user is not exist?")
     return None
 
   schema_str = found_element.get_attribute("innerHTML")
@@ -147,8 +147,10 @@ def daily_loop():
     if schema:
         data = get_profile_data_from_schema(schema)
         fetched_data[target["id"]] = data
+        fetched_data[target["id"]]["success"] = True
     else:
-        log("Can't continue due to error!")
+        log("Can't continue for this account due to error!")
+        fetched_data[target["id"]]["success"] = False
 
   try:
     with connect_db() as db_connection:
@@ -156,6 +158,10 @@ def daily_loop():
 
       with db_connection.cursor() as cursor:
         for target in config["targets"]:
+          if not fetched_data[target["id"]]["success"]:
+            log("Skipping account ID {}, due to crawling error.".format(target["id"]))
+            continue
+
           followers = fetched_data[target["id"]]["follower_count"]
           followings = fetched_data[target["id"]]["following_count"]
           statuses = fetched_data[target["id"]]["tweet_count"]
@@ -170,6 +176,7 @@ def daily_loop():
           finally:
             pass
         cursor.fetchall()
+
       db_connection.commit()
       log("Database changes are successfully committed.")
   except:
