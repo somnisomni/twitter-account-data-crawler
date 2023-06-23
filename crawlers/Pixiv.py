@@ -1,11 +1,7 @@
-import json
-from time import sleep
 from selenium.webdriver import Chrome
-from selenium.common.exceptions import StaleElementReferenceException
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
-from selenium.webdriver.remote.webelement import WebElement
 from crawlers.CrawlerBase import CrawlerBase
 from util import log
 
@@ -32,6 +28,8 @@ class Pixiv(CrawlerBase):
   def wait(self):
     log("Waiting for dynamic load to be completed...")
     wait = WebDriverWait(self.driver, 5)
+
+    # TODO: This won't work; need investigate
     wait.until(EC.presence_of_element_located((By.XPATH, self.__STAT_COUNT_XPATH)))
 
   def do_crawl(self) -> dict:
