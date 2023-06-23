@@ -6,13 +6,13 @@ class CrawlerBase(ABC):
     self.driver = driver
 
   @abstractmethod
-  def __navigate(self): pass
+  def navigate(self): pass
 
   @abstractmethod
-  def __wait(self): pass
+  def wait(self): pass
 
   @abstractmethod
   def do_crawl(self) -> dict:
-    self.__navigate()
-    self.__wait()
+    self.navigate()
+    self.wait()
     pass

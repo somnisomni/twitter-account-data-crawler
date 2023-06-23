@@ -16,7 +16,7 @@ class Twitter(CrawlerBase):
     self.handle = handle
     self.account_id = account_id
 
-  def __navigate(self):
+  def navigate(self):
     if self.handle:
       log("Start navigating to Twitter profile page of @{}.".format(self.handle))
       self.driver.get("https://twitter.com/{}".format(self.handle.replace("@", "")))
@@ -24,7 +24,7 @@ class Twitter(CrawlerBase):
       log("Start navigating to Twitter profile page of account ID {}.".format(self.account_id))
       self.driver.get("https://twitter.com/intent/user?user_id={}".format(self.account_id))
 
-  def __wait(self):
+  def wait(self):
     log("Waiting for dynamic load to be completed...")
     wait = WebDriverWait(self.driver, 5)
     wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, "[data-testid='primaryColumn']")))
