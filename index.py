@@ -113,7 +113,7 @@ if __name__ == "__main__":
     exit(1)
 
   # Log configuration
-  log("Total {} account(s) will be crawled.".format(len(config["targets"])))
+  log("Total {} target(s) will be crawled.".format(len(config["targets"])))
 
   # Schedule
   SCHED_HOUR = 23
