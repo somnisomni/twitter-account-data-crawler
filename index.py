@@ -1,25 +1,15 @@
 from selenium import webdriver
-from selenium.common.exceptions import StaleElementReferenceException
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.common.by import By
-from selenium.webdriver.remote.webelement import WebElement
 from apscheduler.schedulers.blocking import BlockingScheduler
 from apscheduler.triggers.cron import CronTrigger
-from time import sleep
 from datetime import date
 import pymysql
-import json
 from const import *
 from config import Config
+from util import log
+from crawlers.Twitter import Twitter
 
 ### --- Global variables --- ###
 config: Config = None
-
-### --- Helper functions --- ##
-def log(value: object, sep = " ", end="\n"):
-  print(value, sep=sep, end=end, flush=True)
-
 
 ### --- Functions --- ###
 def load_config() -> bool:
@@ -55,77 +45,6 @@ def create_chrome_webdriver() -> webdriver.Chrome | None:
   except:
     return None
 
-def navigate_to_handle(driver: webdriver.Chrome, handle: str):
-  log("Start navigating to Twitter profile page of @{}.".format(handle))
-  driver.get("https://twitter.com/{}".format(handle.replace("@", "")))
-
-def navigate_to_account_id(driver: webdriver.Chrome, id: str | int):
-  log("Start navigating to Twitter profile page of account ID {}.".format(id))
-  driver.get("https://twitter.com/intent/user?user_id={}".format(id))
-
-def wait_for_dynamic_load(driver: webdriver.Chrome):
-  log("Waiting for dynamic load to be completed...")
-  wait = WebDriverWait(driver, 5)
-  wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, "[data-testid='primaryColumn']")))
-  wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, "[data-testid='UserName']")))
-
-def try_find_user_profile_schema(driver: webdriver.Chrome) -> dict:
-  find_count = 1
-  find_count_max = 5
-  find_interval_sec = 1
-  found_element: WebElement = None
-  schema_str = None
-
-  while (not found_element) and (find_count <= find_count_max):
-    log("Trying to find user profile schema... {}/{}".format(find_count, find_count_max))
-
-    try:
-      script_elements: list[WebElement] = driver.find_elements(By.TAG_NAME, "script")
-    except StaleElementReferenceException:
-      log("Any script element is not present, sleep 2 seconds and retry...")
-      sleep(2)
-      find_count += 1
-      continue
-
-    for elem in script_elements:
-      if elem.get_dom_attribute("type") == "application/ld+json" \
-         and elem.get_dom_attribute("data-testid") == "UserProfileSchema-test":
-        found_element = elem
-        break
-
-    if not found_element:
-      find_count += 1
-      sleep(find_interval_sec)
-
-  if not found_element:
-    log("Can't find user profile schema; was the website updated, or user is not exist?")
-    return None
-
-  schema_str = found_element.get_attribute("innerHTML")
-  if schema_str:
-    log("Found.")
-    return json.loads(schema_str)
-  else:
-    log("No content in user profile schema element.")
-    return None
-
-def get_profile_data_from_schema(data: dict) -> dict:
-  result = {
-    "id": data["author"]["identifier"],
-    "screen_name": data["author"]["additionalName"],
-    "nickname": data["author"]["givenName"],
-  }
-
-  for stat in data["author"]["interactionStatistic"]:
-    if stat["name"] == "Follows": # Followers
-      result["follower_count"] = int(stat["userInteractionCount"])
-    elif stat["name"] == "Friends": # Followings
-      result["following_count"] = int(stat["userInteractionCount"])
-    elif stat["name"] == "Tweets": # Tweets
-      result["tweet_count"] = int(stat["userInteractionCount"])
-
-  return result
-
 def daily_loop():
   global config
 
@@ -140,14 +59,11 @@ def daily_loop():
 
   fetched_data = dict()
   for target in config["targets"]:
-    navigate_to_account_id(driver, target["id"])
-    wait_for_dynamic_load(driver)
+    data = Twitter(driver, account_id=target["id"]).do_crawl()
 
-    schema = try_find_user_profile_schema(driver)
-    if schema:
-        data = get_profile_data_from_schema(schema)
-        fetched_data[target["id"]] = data
-        fetched_data[target["id"]]["success"] = True
+    if data:
+      fetched_data[target["id"]] = data
+      fetched_data[target["id"]]["success"] = True
     else:
         log("Can't continue for this account due to error!")
         fetched_data[target["id"]]["success"] = False
