@@ -1,4 +1,5 @@
 from selenium import webdriver
+from selenium_stealth import stealth
 from apscheduler.schedulers.blocking import BlockingScheduler
 from apscheduler.triggers.cron import CronTrigger
 from datetime import date
@@ -39,6 +40,12 @@ def create_chrome_webdriver() -> webdriver.Chrome | None:
   try:
     driver = webdriver.Chrome(options=options)
     driver.implicitly_wait(10)
+
+    stealth(driver,
+            user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36",
+            languages=["ko-KR", "ko", "en-US", "en"],
+            platform="Linux64",
+            fix_hairline=True)
 
     log("Chrome WebDriver instance created, with arguments: {}".format(" ".join(DRIVER_ARGUMENTS)))
     return driver

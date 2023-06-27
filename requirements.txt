@@ -2,3 +2,4 @@ pyyaml
 pymysql
 APScheduler
 selenium
+selenium-stealth
