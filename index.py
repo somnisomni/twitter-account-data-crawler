@@ -103,7 +103,7 @@ def daily_loop():
             log("Skipping account ID {}, due to crawling error.".format(data["data"]["id"]))
             continue
 
-          table = str(data["data"]["table"])
+          table = str(data["table"])
           followers = str(data["data"]["follower_count"])
           followings = str(data["data"]["following_count"])
           statuses = str(data["data"]["tweet_count"])
