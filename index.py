@@ -8,6 +8,7 @@ from const import *
 from config import Config
 from util import log
 from crawlers.Twitter import Twitter
+from crawlers.TwitterWorkaround import TwitterWorkaround
 
 ### --- Global variables --- ###
 config: Config = None
@@ -35,7 +36,8 @@ def connect_db() -> pymysql.Connection:
 def create_chrome_webdriver() -> webdriver.Chrome | None:
   options = webdriver.ChromeOptions()
   for arg in DRIVER_ARGUMENTS:
-    options.add_argument(arg)
+    if arg:
+      options.add_argument(arg)
 
   try:
     driver = webdriver.Chrome(options=options)
@@ -64,33 +66,50 @@ def daily_loop():
     log("Error while creating Chrome WebDriver.")
     exit(1)
 
-  fetched_data = dict()
+  fetched_data: list[dict] = []
   for target in config["targets"]:
-    data = Twitter(driver, account_id=target["id"]).do_crawl()
+    log("")
 
-    if data:
-      fetched_data[target["id"]] = data
-      fetched_data[target["id"]]["success"] = True
+    if "handle" in target:
+      if "workaround_status_id" in target:
+        data = TwitterWorkaround(driver, handle=target["handle"], status_id=target["workaround_status_id"]).do_crawl()
+      else:
+        data = Twitter(driver, handle=target["handle"]).do_crawl()
     else:
-        log("Can't continue for this account due to error!")
-        fetched_data[target["id"]]["success"] = False
+      data = Twitter(driver, account_id=target["id"]).do_crawl()
+
+    fdata = {}
+    if data:
+      fdata["data"] = data
+      fdata["table"] = target["table"]
+      fdata["success"] = True
+
+      fetched_data.append(fdata)
+    else:
+      fdata["data"] = None
+      fdata["table"] = None
+      fdata["success"] = False
+
+      log("Can't continue for this account due to error!")
+      fetched_data.append(fdata)
 
   try:
     with connect_db() as db_connection:
       log("Connected with database server.")
 
       with db_connection.cursor() as cursor:
-        for target in config["targets"]:
-          if not fetched_data[target["id"]]["success"]:
-            log("Skipping account ID {}, due to crawling error.".format(target["id"]))
+        for data in fetched_data:
+          if not data["success"]:
+            log("Skipping account ID {}, due to crawling error.".format(data["data"]["id"]))
             continue
 
-          followers = fetched_data[target["id"]]["follower_count"]
-          followings = fetched_data[target["id"]]["following_count"]
-          statuses = fetched_data[target["id"]]["tweet_count"]
+          table = str(data["data"]["table"])
+          followers = str(data["data"]["follower_count"])
+          followings = str(data["data"]["following_count"])
+          statuses = str(data["data"]["tweet_count"])
 
           try:
-            cursor.execute("INSERT INTO {} (date, following_count, follower_count, tweet_count) VALUES (%s, %s, %s, %s)".format(str(target["table"]).split()[0]),
+            cursor.execute("INSERT INTO {} (date, following_count, follower_count, tweet_count) VALUES (%s, %s, %s, %s)".format(table.split()[0]),
                           (today_date.strftime("%Y-%m-%d"),
                           followings,
                           followers,

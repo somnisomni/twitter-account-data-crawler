@@ -1,7 +1,7 @@
 import json
 from time import sleep
 from selenium.webdriver import Chrome
-from selenium.common.exceptions import StaleElementReferenceException
+from selenium.common.exceptions import StaleElementReferenceException, TimeoutException
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
@@ -25,10 +25,14 @@ class Twitter(CrawlerBase):
       self.driver.get("https://twitter.com/intent/user?user_id={}".format(self.account_id))
 
   def wait(self):
-    log("Waiting for dynamic load to be completed...")
-    wait = WebDriverWait(self.driver, 5)
-    wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, "[data-testid='primaryColumn']")))
-    wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, "[data-testid='UserName']")))
+    try:
+      log("Waiting for dynamic load to be completed...")
+      wait = WebDriverWait(self.driver, 5)
+      wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, "[data-testid='primaryColumn']")))
+      wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, "[data-testid='UserName']")))
+    except TimeoutException:
+      log("Seems like the page is not loaded correctly! Is the website updated, or Twitter blocked access?")
+      return
 
   def __find_user_profile_schema(self) -> dict:
     find_count = 1
@@ -38,7 +42,7 @@ class Twitter(CrawlerBase):
     schema_str = None
 
     while (not found_element) and (find_count <= find_count_max):
-      log("Trying to find user profile schema... #{} try out of {}".format(find_count, find_count_max))
+      log("Trying to locate user profile schema... #{} try out of {}".format(find_count, find_count_max))
 
       try:
         script_elements: list[WebElement] = self.driver.find_elements(By.TAG_NAME, "script")
@@ -59,7 +63,7 @@ class Twitter(CrawlerBase):
         sleep(find_interval_sec)
 
     if not found_element:
-      log("Can't find user profile schema; was the website updated, or user is not exist?")
+      log("Can't locate user profile schema; Is the website updated, or user is not exist?")
       return None
 
     schema_str = found_element.get_attribute("innerHTML")

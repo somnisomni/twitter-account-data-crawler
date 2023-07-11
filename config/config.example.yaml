@@ -8,5 +8,6 @@ mysql:
 targets:
   - id: 12
     table: twitter_jack
-  - id: 11348282
+  - handle: nasa
     table: twitter_nasa
+    workaround_status_id: 1677028218186997761
