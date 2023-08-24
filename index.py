@@ -51,7 +51,8 @@ def create_chrome_webdriver() -> webdriver.Chrome | None:
 
     log("Chrome WebDriver instance created, with arguments: {}".format(" ".join(DRIVER_ARGUMENTS)))
     return driver
-  except:
+  except Exception as e:
+    log("Error while creating Chrome WebDriver: {}".format(e))
     return None
 
 def daily_loop():
@@ -60,11 +61,12 @@ def daily_loop():
   log("\nDaily loop job started...")
 
   today_date = date.today()
+  log("Today is {}".format(today_date.strftime("%Y-%m-%d")))
 
   driver = create_chrome_webdriver()
   if not driver:
-    log("Error while creating Chrome WebDriver.")
-    exit(1)
+    log("Error while creating Chrome WebDriver! Can't continue, exiting daily loop job.")
+    return
 
   fetched_data: list[dict] = []
   for target in config["targets"]:
