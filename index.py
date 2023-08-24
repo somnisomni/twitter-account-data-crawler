@@ -1,4 +1,5 @@
 from selenium import webdriver
+from selenium.webdriver.chrome.service import Service as ChromeService
 from selenium_stealth import stealth
 from apscheduler.schedulers.blocking import BlockingScheduler
 from apscheduler.triggers.cron import CronTrigger
@@ -39,8 +40,10 @@ def create_chrome_webdriver() -> webdriver.Chrome | None:
     if arg:
       options.add_argument(arg)
 
+  service = ChromeService(executable_path=CHROMEDRIVER_PATH)
+
   try:
-    driver = webdriver.Chrome(options=options)
+    driver = webdriver.Chrome(options=options, service=service)
     driver.implicitly_wait(10)
 
     stealth(driver,
