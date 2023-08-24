@@ -58,7 +58,7 @@ def create_chrome_webdriver() -> webdriver.Chrome | None:
     log("Error while creating Chrome WebDriver: {}".format(e))
     return None
 
-def daily_loop():
+def daily_loop(db_dry: bool = False):
   global config
 
   log("\nDaily loop job started...")
@@ -98,36 +98,39 @@ def daily_loop():
       log("Can't continue for this account due to error!")
       fetched_data.append(fdata)
 
-  try:
-    with connect_db() as db_connection:
-      log("Connected with database server.")
+  if not db_dry:
+    try:
+      with connect_db() as db_connection:
+        log("Connected with database server.")
 
-      with db_connection.cursor() as cursor:
-        for data in fetched_data:
-          if not data["success"]:
-            log("Skipping account ID {}, due to crawling error.".format(data["data"]["id"]))
-            continue
+        with db_connection.cursor() as cursor:
+          for data in fetched_data:
+            if not data["success"]:
+              log("Skipping account ID {}, due to crawling error.".format(data["data"]["id"]))
+              continue
 
-          table = str(data["table"])
-          followers = str(data["data"]["follower_count"])
-          followings = str(data["data"]["following_count"])
-          statuses = str(data["data"]["tweet_count"])
+            table = str(data["table"])
+            followers = str(data["data"]["follower_count"])
+            followings = str(data["data"]["following_count"])
+            statuses = str(data["data"]["tweet_count"])
 
-          try:
-            cursor.execute("INSERT INTO {} (date, following_count, follower_count, tweet_count) VALUES (%s, %s, %s, %s)".format(table.split()[0]),
-                          (today_date.strftime("%Y-%m-%d"),
-                          followings,
-                          followers,
-                          statuses))
-            log("Row inserted.")
-          finally:
-            pass
-        cursor.fetchall()
+            try:
+              cursor.execute("INSERT INTO {} (date, following_count, follower_count, tweet_count) VALUES (%s, %s, %s, %s)".format(table.split()[0]),
+                            (today_date.strftime("%Y-%m-%d"),
+                            followings,
+                            followers,
+                            statuses))
+              log("Row inserted.")
+            finally:
+              pass
+          cursor.fetchall()
 
-      db_connection.commit()
-      log("Database changes are successfully committed.")
-  except:
-    log("Something wrong while manipulating the database! Is database server available, and database config is valid?")
+        db_connection.commit()
+        log("Database changes are successfully committed.")
+    except:
+      log("Something wrong while manipulating the database! Is database server available, and database config is valid?")
+  else:
+    log("DB dry run mode enabled, skipping database manipulation.")
 
   log("Chrome WebDriver cleanup.")
   driver.quit()
