@@ -18,7 +18,7 @@ class TwitterWorkaround(Twitter):
     self.status_id = status_id
 
   def navigate(self, current_retry: int = 0, retry_count: int = 5):
-    wait = WebDriverWait(self.driver, 10)
+    wait = WebDriverWait(self.driver, 5)
 
     try:
       ''' Stage 1. Navigate to status page '''
@@ -38,8 +38,8 @@ class TwitterWorkaround(Twitter):
 
       ''' Stage 2-1. Wait for dynamic load '''
       log("Waiting for dynamic load to be completed...")
-      wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, "[data-testid='primaryColumn']")))
-      wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, "[data-testid='UserName']")))
+      self._wait_retry(wait, EC.presence_of_element_located((By.CSS_SELECTOR, "[data-testid='primaryColumn']")))
+      self._wait_retry(wait, EC.presence_of_element_located((By.CSS_SELECTOR, "[data-testid='UserName']")))
     except:
       log("Seems like the page is not loaded correctly! Is the website updated, or Twitter blocked access?")
       return

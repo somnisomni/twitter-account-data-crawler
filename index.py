@@ -95,8 +95,10 @@ def daily_loop(db_dry: bool = False):
       fdata["table"] = None
       fdata["success"] = False
 
-      log("Can't continue for this account due to error!")
+      log("Can't continue for this account due to crawling error!")
       fetched_data.append(fdata)
+  
+  log("")
 
   if not db_dry:
     try:

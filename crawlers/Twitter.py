@@ -27,9 +27,9 @@ class Twitter(CrawlerBase):
   def wait(self):
     try:
       log("Waiting for dynamic load to be completed...")
-      wait = WebDriverWait(self.driver, 10)
-      wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, "[data-testid='primaryColumn']")))
-      wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, "[data-testid='UserName']")))
+      wait = WebDriverWait(self.driver, 5)
+      self._wait_retry(wait, EC.presence_of_element_located((By.CSS_SELECTOR, "[data-testid='primaryColumn']")))
+      self._wait_retry(wait, EC.presence_of_element_located((By.CSS_SELECTOR, "[data-testid='UserName']")))
     except TimeoutException:
       log("Seems like the page is not loaded correctly! Is the website updated, or Twitter blocked access?")
       return

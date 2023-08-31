@@ -8,7 +8,7 @@ class CrawlerBase(ABC):
   def __init__(self, driver: Chrome):
     self.driver = driver
 
-  def _wait_retry(self, wdw: WebDriverWait, target_method, retry_count: int = 5) -> bool:
+  def _wait_retry(self, wdw: WebDriverWait, target_method, retry_count: int = 3) -> bool:
     count = 0
 
     while count < retry_count:
@@ -17,6 +17,10 @@ class CrawlerBase(ABC):
         wdw.until(target_method)
       except TimeoutException:
         count += 1
+
+        if count >= retry_count:
+          log(" ...Failed to wait!")
+  
         continue
 
       log("")
