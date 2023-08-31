@@ -46,10 +46,15 @@ def create_chrome_webdriver() -> webdriver.Chrome | None:
     driver = webdriver.Chrome(options=options, service=service)
     driver.implicitly_wait(10)
 
+    driver.execute_script("Object.defineProperty(navigator, 'webdriver', { get: () => undefined })")
+
     stealth(driver,
             user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36",
             languages=["ko-KR", "ko", "en-US", "en"],
             platform="Linux64",
+            vendor="Google Inc.",
+            webgl_vendor="Intel Inc.",
+            renderer="Intel Iris OpenGL Engine",
             fix_hairline=True)
 
     log("Chrome WebDriver instance created, with arguments: {}".format(" ".join(DRIVER_ARGUMENTS)))
