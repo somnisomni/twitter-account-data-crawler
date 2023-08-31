@@ -103,32 +103,43 @@ def daily_loop(db_dry: bool = False):
       with connect_db() as db_connection:
         log("Connected with database server.")
 
-        with db_connection.cursor() as cursor:
-          for data in fetched_data:
-            if not data["success"]:
-              log("Skipping account ID {}, due to crawling error.".format(data["data"]["id"]))
-              continue
+        try:
+          with db_connection.cursor() as cursor:
+            for data in fetched_data:
+              if (not ("success" in data)) or (not data["success"]):
+                log("Skipping account ID {}, due to crawling error.".format(data["data"]["id"]))
+                continue
 
-            table = str(data["table"])
-            followers = str(data["data"]["follower_count"])
-            followings = str(data["data"]["following_count"])
-            statuses = str(data["data"]["tweet_count"])
+              table = str(data["table"])
+              followers = str(data["data"]["follower_count"])
+              followings = str(data["data"]["following_count"])
+              statuses = str(data["data"]["tweet_count"])
 
-            try:
-              cursor.execute("INSERT INTO {} (date, following_count, follower_count, tweet_count) VALUES (%s, %s, %s, %s)".format(table.split()[0]),
-                            (today_date.strftime("%Y-%m-%d"),
-                            followings,
-                            followers,
-                            statuses))
-              log("Row inserted.")
-            finally:
-              pass
-          cursor.fetchall()
+              try:
+                cursor.execute("INSERT INTO {} (date, following_count, follower_count, tweet_count) VALUES (%s, %s, %s, %s)".format(table.split()[0]),
+                              (today_date.strftime("%Y-%m-%d"),
+                              followings,
+                              followers,
+                              statuses))
+                log("Row inserted.")
+              except Exception as e:
+                log("Failed to execute DB query!")
+                log(e)
+                continue
+            cursor.fetchall()
+        except Exception as e:
+          log("Failed to create DB cursor or manipulate DB!")
+          log(e)
 
-        db_connection.commit()
-        log("Database changes are successfully committed.")
-    except:
+        try:
+          db_connection.commit()
+          log("Database changes are successfully committed.")
+        except Exception as e:
+          log("Failed to commit DB!")
+          log(e)
+    except Exception as e:
       log("Something wrong while manipulating the database! Is database server available, and database config is valid?")
+      log(e)
   else:
     log("DB dry run mode enabled, skipping database manipulation.")
 
