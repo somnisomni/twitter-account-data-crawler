@@ -17,7 +17,7 @@ class TwitterWorkaround(Twitter):
     self.handle = handle.replace("@", "")
     self.status_id = status_id
 
-  def navigate(self):
+  def navigate(self, current_retry: int = 0, retry_count: int = 5):
     wait = WebDriverWait(self.driver, 10)
 
     try:
@@ -27,8 +27,8 @@ class TwitterWorkaround(Twitter):
 
       ''' Stage 1-1. Wait for dynamic load '''
       log("Waiting for dynamic load to be completed...")
-      wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, "[data-testid='primaryColumn']")))
-      wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, "[data-testid='User-Name']")))
+      self._wait_retry(wait, EC.presence_of_element_located((By.CSS_SELECTOR, "[data-testid='primaryColumn']")))
+      self._wait_retry(wait, EC.presence_of_element_located((By.CSS_SELECTOR, "[data-testid='User-Name']")))
 
       ''' Stage 2. Navigate to profile page by clicking username anchor '''
       log("Status page loaded, try finding and clicking profile link anchor...")
