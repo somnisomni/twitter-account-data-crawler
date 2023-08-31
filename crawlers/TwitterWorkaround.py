@@ -18,7 +18,7 @@ class TwitterWorkaround(Twitter):
     self.status_id = status_id
 
   def navigate(self):
-    wait = WebDriverWait(self.driver, 5)
+    wait = WebDriverWait(self.driver, 10)
 
     try:
       ''' Stage 1. Navigate to status page '''
