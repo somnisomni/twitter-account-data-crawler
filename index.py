@@ -90,19 +90,19 @@ def daily_loop(db_dry: bool = False):
 
     fdata = {}
     if data:
+      fdata["id"] = target["id"]
       fdata["data"] = data
       fdata["table"] = target["table"]
       fdata["success"] = True
 
       fetched_data.append(fdata)
     else:
-      fdata["data"] = None
-      fdata["table"] = None
+      fdata["id"] = target["id"]
       fdata["success"] = False
 
       log("Can't continue for this account due to crawling error!")
       fetched_data.append(fdata)
-  
+
   log("")
 
   if not db_dry:
@@ -114,7 +114,7 @@ def daily_loop(db_dry: bool = False):
           with db_connection.cursor() as cursor:
             for data in fetched_data:
               if (not ("success" in data)) or (not data["success"]):
-                log("Skipping account ID {}, due to crawling error.".format(data["data"]["id"]))
+                log("Skipping account ID {}, due to crawling error.".format(data["id"]))
                 continue
 
               table = str(data["table"])
