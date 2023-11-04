@@ -80,24 +80,26 @@ def daily_loop(db_dry: bool = False):
   for target in config["targets"]:
     log("")
 
+    fdata = {}
     if "handle" in target:
+      fdata["id"] = target["handle"]
+
       if "workaround_status_id" in target:
         data = TwitterWorkaround(driver, handle=target["handle"], status_id=target["workaround_status_id"]).do_crawl()
       else:
         data = Twitter(driver, handle=target["handle"]).do_crawl()
     else:
+      fdata["id"] = target["id"]
+
       data = Twitter(driver, account_id=target["id"]).do_crawl()
 
-    fdata = {}
     if data:
-      fdata["id"] = target["id"]
       fdata["data"] = data
       fdata["table"] = target["table"]
       fdata["success"] = True
 
       fetched_data.append(fdata)
     else:
-      fdata["id"] = target["id"]
       fdata["success"] = False
 
       log("Can't continue for this account due to crawling error!")
