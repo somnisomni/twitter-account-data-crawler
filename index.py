@@ -34,7 +34,7 @@ def connect_db() -> pymysql.Connection:
                          password=(config["mysql"]["password"] if config["mysql"]["password"] else None),
                          database=(config["mysql"]["database"] if config["mysql"]["database"] else None))
 
-def create_chrome_webdriver() -> webdriver.Chrome | None:
+def create_chrome_webdriver() -> webdriver.Chrome:
   options = webdriver.ChromeOptions()
   for arg in DRIVER_ARGUMENTS:
     if arg:
@@ -170,8 +170,7 @@ if __name__ == "__main__":
   log("Total {} target(s) will be crawled.".format(len(config["targets"])))
 
   # Schedule
-  SCHED_HOUR = 23
-  SCHED_MINUTE = 58
+  SCHED_HOUR, SCHED_MINUTE = config["schedule"]["time"].split(":") if ("schedule" in config and "time" in config["schedule"]) else (23, 55)
   sched = BlockingScheduler(timezone="Asia/Seoul")
   sched.add_job(daily_loop, CronTrigger.from_crontab("{} {} * * *".format(SCHED_MINUTE, SCHED_HOUR)))
 
