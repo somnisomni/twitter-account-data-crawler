@@ -11,7 +11,7 @@ from util import log
 from crawlers.Twitter import Twitter
 
 class TwitterWorkaround(Twitter):
-  def __init__(self, driver: Chrome, handle: str | None = None, status_id: str | None = None):
+  def __init__(self, driver: Chrome, handle: str = None, status_id: str = None):
     super()
     self.driver = driver
     self.handle = handle.replace("@", "")

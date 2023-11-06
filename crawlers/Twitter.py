@@ -10,7 +10,7 @@ from crawlers.CrawlerBase import CrawlerBase
 from util import log
 
 class Twitter(CrawlerBase):
-  def __init__(self, driver: Chrome, handle: str | None = None, account_id: str | None = None):
+  def __init__(self, driver: Chrome, handle: str = None, account_id: str = None):
     super()
     self.driver = driver
     self.handle = handle

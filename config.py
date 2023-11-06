@@ -3,7 +3,7 @@ import os
 import yaml
 
 class Config:
-  __config: dict | None = None
+  __config: dict = None
 
   def __init__(self):
     if self.__config_file_exists():
