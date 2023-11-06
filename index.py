@@ -124,13 +124,13 @@ def daily_loop(db_dry: bool = False):
                 log("Skipping account ID {}, due to crawling error.".format(data["id"]))
                 continue
 
-              table = str(data["table"])
-              followers = str(data["data"]["follower_count"])
+              table      = str(data["table"]).split()[0]
+              followers  = str(data["data"]["follower_count"])
               followings = str(data["data"]["following_count"])
-              statuses = str(data["data"]["tweet_count"])
+              statuses   = str(data["data"]["tweet_count"])
 
               try:
-                cursor.execute("INSERT INTO {} (date, following_count, follower_count, tweet_count) VALUES (%s, %s, %s, %s)".format(table.split()[0]),
+                cursor.execute("INSERT INTO {} (date, following_count, follower_count, tweet_count) VALUES (%s, %s, %s, %s)".format(table),
                               (today_date.strftime("%Y-%m-%d"),
                               followings,
                               followers,
