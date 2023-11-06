@@ -4,35 +4,40 @@ from selenium_stealth import stealth
 from apscheduler.schedulers.blocking import BlockingScheduler
 from apscheduler.triggers.cron import CronTrigger
 from datetime import date
-import pymysql
 from const import *
 from config import Config
+from db import Database
 from util import log
 from crawlers.Twitter import Twitter
 from crawlers.TwitterWorkaround import TwitterWorkaround
 
 ### --- Global variables --- ###
 config: Config = None
+db: Database = None
 
 ### --- Functions --- ###
-def load_config() -> bool:
-  global config
-  config = Config()
+def initialize() -> bool:
+  global config, db
 
-  if config.is_config_loaded():
-    log("Config loaded.")
-    return True
-  else:
+  # CONFIG
+  config = Config()
+  if not config.is_config_loaded():
     log("Config cannot be loaded!")
     return False
 
-def connect_db() -> pymysql.Connection:
-  global config
-  return pymysql.connect(host=(config["mysql"]["host"] if config["mysql"]["host"] else None),
-                         port=(config["mysql"]["port"] if config["mysql"]["port"] else None),
-                         user=(config["mysql"]["username"] if config["mysql"]["username"] else None),
-                         password=(config["mysql"]["password"] if config["mysql"]["password"] else None),
-                         database=(config["mysql"]["database"] if config["mysql"]["database"] else None))
+  # DB
+  db = Database(
+    host=config["mysql"]["host"] if config["mysql"]["host"] else None,
+    port=config["mysql"]["port"] if config["mysql"]["port"] else None,
+    user=config["mysql"]["username"] if config["mysql"]["username"] else None,
+    password=config["mysql"]["password"] if config["mysql"]["password"] else None,
+    database=config["mysql"]["database"] if config["mysql"]["database"] else None
+  )
+  if not db.test_connection():
+    log("Failed to test connection! Is the database configuration valid?")
+    return False
+
+  return True
 
 def create_chrome_webdriver() -> webdriver.Chrome:
   options = webdriver.ChromeOptions()
@@ -109,7 +114,7 @@ def daily_loop(db_dry: bool = False):
 
   if not db_dry:
     try:
-      with connect_db() as db_connection:
+      with db.create_connection() as db_connection:
         log("Connected with database server.")
 
         try:
@@ -163,7 +168,7 @@ def daily_loop(db_dry: bool = False):
 if __name__ == "__main__":
   log("\n\nMain procedure started.\n")
 
-  if not load_config():
+  if not initialize():
     exit(1)
 
   # Log configuration
