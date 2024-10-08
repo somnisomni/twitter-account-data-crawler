@@ -3,3 +3,4 @@ pymysql
 APScheduler
 selenium
 selenium-stealth
+webdriver_manager

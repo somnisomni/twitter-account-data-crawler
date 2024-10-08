@@ -1,6 +1,7 @@
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service as ChromeService
 from selenium_stealth import stealth
+from webdriver_manager.chrome import ChromeDriverManager
 from apscheduler.schedulers.blocking import BlockingScheduler
 from apscheduler.triggers.cron import CronTrigger
 from datetime import date
@@ -45,7 +46,11 @@ def create_chrome_webdriver() -> webdriver.Chrome:
     if arg:
       options.add_argument(arg)
 
-  service = ChromeService(executable_path=CHROMEDRIVER_PATH)
+  service = None
+  if USE_DRIVER_MANAGER:
+    service = ChromeService(ChromeDriverManager().install())
+  else:
+    service = ChromeService(executable_path=CHROMEDRIVER_PATH)
 
   try:
     driver = webdriver.Chrome(options=options, service=service)
