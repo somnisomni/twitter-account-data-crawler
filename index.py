@@ -94,7 +94,7 @@ def daily_loop(db_dry: bool = False):
     if "handle" in target:
       fdata["id"] = target["handle"]
 
-      if "workaround_status_id" in target:
+      if target["type"] == "twitter_workaround":
         data = TwitterWorkaround(driver, handle=target["handle"], status_id=target["workaround_status_id"]).do_crawl()
       else:
         data = Twitter(driver, handle=target["handle"]).do_crawl()

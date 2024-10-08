@@ -1,6 +1,9 @@
+### Defines when the crawling process will be occured
 schedule:
+  # Start time in a day for crawling process. Must in format "HH:MM"
   time: "23:55"
 
+### MySQL database connection configurations
 mysql:
   host: 127.0.0.1
   port: 3309
@@ -8,9 +11,12 @@ mysql:
   password: crawler_password
   database: account_track
 
+### Defines the list of crawling targets
 targets:
-  - id: 12
+  - type: twitter
+    id: 12
     table: twitter_jack
-  - handle: nasa
+  - type: twitter_workaround
+    handle: nasa
     table: twitter_nasa
     workaround_status_id: 1677028218186997761
