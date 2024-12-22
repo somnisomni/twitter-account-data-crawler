@@ -1,6 +1,6 @@
-pyyaml
-pymysql
-APScheduler
-selenium
-selenium-stealth
-webdriver_manager
+pyyaml==6.0.2
+pymysql==1.1.1
+APScheduler==3.11.0
+selenium==4.27.1
+selenium-stealth==1.0.6
+webdriver-manager==4.0.2
