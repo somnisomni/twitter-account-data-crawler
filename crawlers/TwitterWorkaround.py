@@ -27,7 +27,7 @@ class TwitterWorkaround(Twitter):
 
       ''' Stage 1-1. Wait for dynamic load '''
       log("Waiting for dynamic load to be completed...")
-      self._wait_retry(wait, EC.presence_of_element_located((By.CSS_SELECTOR, "[data-testid='primaryColumn']")))
+      self._wait_retry(wait, EC.presence_of_element_located((By.CSS_SELECTOR, "[data-testid='tweetText']")))
       self._wait_retry(wait, EC.presence_of_element_located((By.CSS_SELECTOR, "[data-testid='User-Name']")))
 
       ''' Stage 2. Navigate to profile page by clicking username anchor '''
@@ -38,7 +38,7 @@ class TwitterWorkaround(Twitter):
 
       ''' Stage 2-1. Wait for dynamic load '''
       log("Waiting for dynamic load to be completed...")
-      self._wait_retry(wait, EC.presence_of_element_located((By.CSS_SELECTOR, "[data-testid='primaryColumn']")))
+      self._wait_retry(wait, EC.presence_of_element_located((By.CSS_SELECTOR, "[data-testid='UserDescription']")))
       self._wait_retry(wait, EC.presence_of_element_located((By.CSS_SELECTOR, "[data-testid='UserName']")))
     except:
       log("Seems like the page is not loaded correctly! Is the website updated, or Twitter blocked access?")

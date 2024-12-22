@@ -28,7 +28,7 @@ class Twitter(CrawlerBase):
     try:
       log("Waiting for dynamic load to be completed...")
       wait = WebDriverWait(self.driver, 5)
-      self._wait_retry(wait, EC.presence_of_element_located((By.CSS_SELECTOR, "[data-testid='primaryColumn']")))
+      self._wait_retry(wait, EC.presence_of_element_located((By.CSS_SELECTOR, "[data-testid='UserDescription']")))
       self._wait_retry(wait, EC.presence_of_element_located((By.CSS_SELECTOR, "[data-testid='UserName']")))
     except TimeoutException:
       log("Seems like the page is not loaded correctly! Is the website updated, or Twitter blocked access?")
@@ -76,12 +76,12 @@ class Twitter(CrawlerBase):
 
   def __get_target_data_from_schema(self, schema: dict) -> dict:
     result = {
-      "id": schema["author"]["identifier"],
-      "screen_name": schema["author"]["additionalName"],
-      "nickname": schema["author"]["givenName"],
+      "id": schema["mainElement"]["identifier"],
+      "screen_name": schema["mainElement"]["additionalName"],
+      "nickname": schema["mainElement"]["givenName"],
     }
 
-    for stat in schema["author"]["interactionStatistic"]:
+    for stat in schema["mainElement"]["interactionStatistic"]:
       if stat["name"] == "Follows": # Followers
         result["follower_count"] = int(stat["userInteractionCount"])
       elif stat["name"] == "Friends": # Followings
