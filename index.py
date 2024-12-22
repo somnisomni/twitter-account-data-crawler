@@ -185,7 +185,7 @@ if __name__ == "__main__":
   sched.add_job(daily_loop, CronTrigger.from_crontab("{} {} * * *".format(SCHED_MINUTE, SCHED_HOUR)))
 
   try:
-    log("\nDaily loop job scheduled, at {}:{} everyday. timezone = {}".format(SCHED_HOUR, SCHED_MINUTE, sched.timezone.zone))
+    log("\nDaily loop job scheduled, at {}:{} everyday. timezone = {}".format(SCHED_HOUR, SCHED_MINUTE, sched.timezone.key))
     sched.start()
   except (KeyboardInterrupt, SystemExit):
     log("Exiting...")
