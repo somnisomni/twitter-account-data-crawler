@@ -76,12 +76,12 @@ class Twitter(CrawlerBase):
 
   def __get_target_data_from_schema(self, schema: dict) -> dict:
     result = {
-      "id": schema["mainElement"]["identifier"],
-      "screen_name": schema["mainElement"]["additionalName"],
-      "nickname": schema["mainElement"]["givenName"],
+      "id": schema["mainEntity"]["identifier"],
+      "screen_name": schema["mainEntity"]["additionalName"],
+      "nickname": schema["mainEntity"]["givenName"],
     }
 
-    for stat in schema["mainElement"]["interactionStatistic"]:
+    for stat in schema["mainEntity"]["interactionStatistic"]:
       if stat["name"] == "Follows": # Followers
         result["follower_count"] = int(stat["userInteractionCount"])
       elif stat["name"] == "Friends": # Followings
