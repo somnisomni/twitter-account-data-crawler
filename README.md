@@ -1,10 +1,14 @@
+Deprecated Project
+------------------
+This project is now deprecated and succeeded by [Trawler](https://github.com/somnisomni/trawler-csharp), which is (trying to) offers more and better features than this, written in C#.
+
 Twitter Account Data Crawler
 ============================
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE.md)
 
 A 'smol' program that **crawls following/followers/statuses count data from Twitter account profile page** using [Selenium](https://www.selenium.dev/), and put the crawled data into [MySQL](https://www.mysql.com/) database using [PyMySQL](https://pypi.org/project/pymysql/).
 
-The purpose of this program is to record the followers count daily and see how the count changes everyday. **MAYBE THIS IS NOT PRODUCTION-READY**, so use this with caution!
+The purpose of this program is to record the followers count daily and see how the count changes everyday. **MAYBE THIS IS NOT PRODUCTION-READY, AND SHOULD BE USED FOR RESEARCH PURPOSE ONLY**. Use this with caution!
 
 
 Why? You Can Simply Use Twitter API, Aren't You?
